@@ -1,0 +1,1507 @@
+create or replace and compile java source named userform_aligner as
+package PAC;
+
+import oracle.sql.CLOB;
+
+import javax.xml.parsers.*;
+import javax.xml.xpath.*;
+
+import org.xml.sax.InputSource;
+import org.w3c.dom.CharacterData;
+import org.w3c.dom.*;
+import java.io.*;
+import org.w3c.dom.Node;
+import java.lang.*;
+import java.io.OutputStream;
+import java.util.Collections;
+import java.util.ArrayList;
+import java.util.*;
+import java.math.BigDecimal;
+
+import org.w3c.dom.Text; 
+
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import oracle.sqlj.runtime.Oracle;
+import oracle.sql.*;
+
+import java.io.Writer;
+import java.sql.SQLException;
+
+import java.sql.CallableStatement;
+import java.sql.Date;
+import java.sql.DriverManager;
+import java.sql.Connection;
+import java.sql.Statement;
+import java.sql.CallableStatement;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Clob;
+
+import javax.xml.*;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
+import java.util.*;
+import java.lang.reflect.Field;
+import java.util.List;
+import javax.xml.transform.OutputKeys;
+import javax.xml.transform.TransformerConfigurationException;
+
+import oracle.xdb.XMLType; 
+
+import org.w3c.dom.ls.DOMImplementationLS;
+import org.w3c.dom.ls.LSSerializer;
+
+import java.text.DecimalFormat;
+
+public class Tab 
+{
+    public String Name;
+    
+    public int Width;
+    public int Height;
+    
+    public int GroupboxCount;
+    
+    public Collection Groupboxes = new ArrayList();
+    
+    public Collection Tabs = new ArrayList();
+    
+    public Node TabNode;
+    
+    //---------------------------------------------
+    
+    public String getName()
+    {
+        return Name;
+    }
+    
+    public int getWidth()
+    {
+        return Width;
+    }
+    
+    public int getHeight()
+    {
+        return Height;
+    }
+    
+    public void setWidth(int val)
+    {
+        if(val != this.Width)
+        {
+            this.Width = val;
+            NodeList param = TabNode.getChildNodes();
+            Node DesignSize = param.item(1);
+            DesignSize.getFirstChild().getFirstChild().getFirstChild().setNodeValue(Integer.toString(val));
+        }
+    }
+    
+    public void setHeight(int val)
+    {
+        if(val != this.Height)
+        {
+            this.Height = val;
+            NodeList param = TabNode.getChildNodes();
+            Node DesignSize = param.item(1);
+            DesignSize.getFirstChild().getLastChild().getFirstChild().setNodeValue(Integer.toString(val));
+        }
+    }
+}
+
+public class Groupbox 
+{
+    public String Name;
+    
+    public int Left;   // левый отступ
+    public int Top;    // верхний отступ
+    public int Width;  // ширина
+    public int Height; //высота
+    
+    public int TabOrder;  // номер при обходе
+    
+    //количество контролов
+    public int ComponentCount;
+    
+    //количество элементов в групбоксе включая дочерние групбоксы
+    public int AllComponentCount;
+    
+    public String WebColumnDefinition;
+    
+    //public Collection ColumnsSize = new ArrayList();
+    //public int[] ColumnsSize;
+    public int ColumnsCount;
+    
+    //колонки групбокса в процентах
+    public int[] Columns;
+    
+    //колонки групбокса в пикселях
+    public int[] ColumnsPX;
+    
+    //массив строк компонентов 
+    public Row[] Rows;
+    
+    public Collection CollRows = new ArrayList();
+    
+    //коллекция компонентов которые есть в групбоксе
+    public Collection Components = new ArrayList();
+    
+    //коллекция групбоксов в данном группбоксе (если имеются)
+    public Collection Groupboxes = new ArrayList();
+    
+    public Node GroupboxNode;
+    
+    //-------------------------------------------------
+    
+    public int getTabOrder()
+    {
+        return TabOrder;
+    }
+    
+    public String getName()
+    {
+        return Name;
+    }
+    
+    public int getLeft()
+    {
+        return Left;
+    }
+    
+    public int getTop()
+    {
+        return Top;
+    }
+    
+    public int getWidth()
+    {
+        return Width;
+    }
+    
+    public int getHeight()
+    {
+        return Height;
+    }
+    
+    public String getWCD()
+    {
+        return WebColumnDefinition;
+    }   
+    
+    public void setLeft(int val)
+    {
+        if(val != this.Left)
+        {
+            this.Left = val;
+
+            NodeList parameters = this.GroupboxNode.getChildNodes();
+            for(int i = 0 ; i < parameters.getLength() ; i++)
+            {
+                Node n = parameters.item(i);
+                if("Left".equals(n.getNodeName()))
+                {
+                    n.getFirstChild().getFirstChild().setNodeValue(Integer.toString(val));
+                }
+            }
+        } 
+    }
+    
+    public void setTop(int val)
+    {
+        if(val != this.Top)
+        {
+            this.Top = val;
+            NodeList parameters = this.GroupboxNode.getChildNodes();
+            for(int i = 0 ; i < parameters.getLength() ; i++)
+            {
+                Node n = parameters.item(i);
+                if("Top".equals(n.getNodeName()))
+                {
+                    n.getFirstChild().getFirstChild().setNodeValue(Integer.toString(val));
+                }
+            }
+        } 
+    }
+    
+    public void setWidth(int val)
+    {
+        if(val != this.Width)
+        {
+            this.Width = val;
+            NodeList parameters = this.GroupboxNode.getChildNodes();
+            for(int i = 0 ; i < parameters.getLength() ; i++)
+            {
+                Node n = parameters.item(i);
+                if("Width".equals(n.getNodeName()))
+                {
+                    n.getFirstChild().getFirstChild().setNodeValue(Integer.toString(val));
+                }
+            }
+        } 
+    }
+    
+    public void setHeight(int val)
+    {
+        if(val != this.Height)
+        {
+            this.Height = val;
+            NodeList parameters = this.GroupboxNode.getChildNodes();
+            for(int i = 0 ; i < parameters.getLength() ; i++)
+            {
+                Node n = parameters.item(i);
+                if("Height".equals(n.getNodeName()))
+                {
+                    n.getFirstChild().getFirstChild().setNodeValue(Integer.toString(val));
+                }
+            }
+        } 
+    }
+}
+
+public class Row 
+{
+    // Если положение метки на каком либо элементе в строке
+    // находится сверху, значение данного поля будет "clAbove"
+    // в другом случае (по умолчанию) "clNear"
+    
+    public String LabeLayout ;
+    
+    // Если в строке наёден элемент с высотой больше чем 0 (21px) 
+    // свойство "isHigh" равно 0, в другом случае (по умолчанию) равно 0
+    
+    public int isHigh;
+    
+    
+    public int rowHeight;
+}
+
+public class Component 
+{
+    public String Type;
+    public String Name;
+    
+    public int Left;
+    public int Top;
+    
+    public int TabOrder;
+    
+    public String ControlLabelLayout;
+    public String ControlLabelWebSize;
+    
+    public int ControlLabelPosition;
+    
+    public int Height;
+    public int Width;
+    public int WebColumnSpan;
+    
+    public Node ComponentNode;
+    
+    public Document doc ;
+    
+    public String ControlLabelText;
+    
+    public String Hint;
+    //-------------------------------------------------------
+    
+    public Component()
+    {
+        this.doc = Aligner.doc;
+    }
+    
+    public int getHeight()
+    {
+        return Height;
+    }
+    
+    public String getCLLayout()
+    {
+        return ControlLabelLayout;
+    }
+    
+    public String getType()
+    {
+        return Type;
+    }
+    
+    public String getName()
+    {
+        return Name;
+    }
+    
+    public int getLeft()
+    {
+        return Left;
+    }
+    
+    public int getTop()
+    {
+        return Top;
+    }
+    
+    public int getWidth()
+    {
+        return Width;
+    }
+    
+    public int getWCS()
+    {
+        return WebColumnSpan;
+    }
+    
+    public int getTabOrder()
+    {
+        return TabOrder;
+    }
+    
+    public void deleteHintNodeAfterAlign()
+    {
+        NodeList nl = this.ComponentNode.getChildNodes();
+        for(int i = 0 ; i < nl.getLength(); i++)
+        {
+            Node n = nl.item(i);
+            if(n.getNodeName() == "Hint")
+            {
+                this.ComponentNode.removeChild(n);
+            }
+        }
+    }
+    
+    public void setControlLabelWebSize(String val)
+    {
+        if(this.Type.indexOf("Button") == -1)
+        {
+            if(this.Type.indexOf("CheckGroup") == -1 )
+            {
+                if(val != this.ControlLabelWebSize)
+                {
+                    boolean flag = false;
+                    this.ControlLabelWebSize = val;
+                    NodeList parameters = this.ComponentNode.getChildNodes();
+                    for(int i = 0 ; i < parameters.getLength() ; i++)
+                    {
+                        Node n = parameters.item(i);
+                        if("ControlLabel.WebSize".equals(n.getNodeName()))
+                        {
+                            n.getFirstChild().setNodeValue(val);
+                            flag = true;
+                        }
+                    }
+                    if(flag == false)
+                    {
+                        if(this.ControlLabelPosition != 10)
+                        {
+                            if(val != "" || val != null)
+                            {
+                                Node target = null;
+                                for(int j = 0 ; j < parameters.getLength(); j++)
+                                {
+                                    Node k = parameters.item(j);
+                                    if("TabOrder".equals(k.getNodeName()))
+                                    {
+                                        target = k;
+                                        break;
+                                    }
+                                }
+
+                                Element el = doc.createElement("ControlLabel.WebSize");
+                                if(target != null)
+                                {
+                                    this.ComponentNode.insertBefore(el, target);
+                                }
+                                else
+                                    this.ComponentNode.appendChild(el);
+
+                                CDATASection cdata = doc.createCDATASection(val);
+                                el.appendChild(cdata);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+       
+    public void setLabelPosition(int val)
+    {
+        if(this.Type.indexOf("Button") == -1)
+        {
+            if(this.Type.indexOf("CheckGroup") == -1 )
+            {
+                if(val != this.ControlLabelPosition)
+                {
+                    boolean flag = false;
+                    this.ControlLabelPosition = val;
+                    NodeList parameters = this.ComponentNode.getChildNodes();
+                    for(int i = 0 ; i < parameters.getLength() ; i++)
+                    {
+                        Node n = parameters.item(i);
+                        if("ControlLabel.Position".equals(n.getNodeName()))
+                        {
+                            n.getFirstChild().getFirstChild().setNodeValue(Integer.toString(val));
+                            flag = true;
+                        }
+                    }
+                    if(flag == false)
+                    {
+                        if(val != 10)
+                        {
+
+                                Node target = null;
+                                for(int j = 0 ; j < parameters.getLength(); j++)
+                                {
+                                    Node k = parameters.item(j);
+                                    if("ControlLabel.Text".equals(k.getNodeName()))
+                                    {
+                                        target = k;
+                                        break;
+                                    }
+                                }
+                                Element el = doc.createElement("ControlLabel.Position");
+                                //this.ComponentNode.appendChild(el);
+                                if(target != null)
+                                {
+                                    this.ComponentNode.insertBefore(el, target);
+                                }
+                                else
+                                   this.ComponentNode.appendChild(el); 
+
+                                Element el1 = doc.createElement("I");
+                                el.appendChild(el1);
+
+                                el1.appendChild(doc.createTextNode(Integer.toString(val)));
+                        }
+                    }
+                } 
+            }
+        }
+    }
+    
+    public void setLeft(int val)
+    {
+        if(val != this.Left)
+        {
+            this.Left = val;
+            NodeList parameters = this.ComponentNode.getChildNodes();
+            for(int i = 0 ; i < parameters.getLength() ; i++)
+            {
+                Node n = parameters.item(i);
+                if("Left".equals(n.getNodeName()))
+                {
+                    n.getFirstChild().getFirstChild().setNodeValue(Integer.toString(val));
+                }
+            }
+        } 
+    }
+    
+    public void setTop(int val)
+    {
+        if(val != this.Top)
+        {
+            this.Top = val;
+            NodeList parameters = this.ComponentNode.getChildNodes();
+            for(int i = 0 ; i < parameters.getLength() ; i++)
+            {
+                Node n = parameters.item(i);
+                if("Top".equals(n.getNodeName()))
+                {
+                    n.getFirstChild().getFirstChild().setNodeValue(Integer.toString(val));
+                }
+            }
+        } 
+    }
+    
+    public void setWidth(int val)
+    {
+        if(val != this.Width)
+        {
+            this.Width = val;
+            NodeList parameters = this.ComponentNode.getChildNodes();
+            for(int i = 0 ; i < parameters.getLength() ; i++)
+            {
+                Node n = parameters.item(i);
+                if("Width".equals(n.getNodeName()))
+                {
+                    n.getFirstChild().getFirstChild().setNodeValue(Integer.toString(val));
+                }
+            }
+        } 
+    }
+}
+
+public class Aligner 
+{ 
+   public static int GBStartPositionTop;
+    
+   public static int GBStartPositionLeft;
+    
+   public static Document doc;
+    
+   public static String getStringFromDoc(org.w3c.dom.Document doc)    
+    {
+           DOMImplementationLS domImplementation = (DOMImplementationLS) doc.getImplementation();
+           LSSerializer lsSerializer = domImplementation.createLSSerializer();
+           return lsSerializer.writeToString(doc);   
+    }        
+ 
+   public static void entry(BigDecimal rn) throws SQLException
+    {
+    try 
+      {
+          oracle.sql.CLOB FormXML; 
+          oracle.sql.CLOB ChangedXML;
+          int form_kind;
+          
+          #sql { SELECT FORM_KIND INTO :form_kind FROM USERFORMS WHERE rn = :rn };
+          
+          if(form_kind == 3)
+          {                                        
+                #sql { SELECT FORM_DATA INTO :FormXML FROM USERFORMS WHERE rn = :rn };
+          }
+          else 
+                #sql { SELECT FORM_DATA_EXT INTO :FormXML FROM USERFORMS WHERE rn = :rn }; 
+                
+          DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+          //dbf.setCoalescing(true);
+          DocumentBuilder db = dbf.newDocumentBuilder();
+          Reader my_clob_xml= FormXML.getCharacterStream();
+          InputSource myInputSource = new InputSource(my_clob_xml);
+          doc = db.parse(myInputSource);   
+               
+          Element root = doc.getDocumentElement(); 
+
+          Collection Tabs = new ArrayList();       
+          
+          if("Object".equals(root.getNodeName()))
+            {
+                System.out.println("Это обычная форма");
+                NodeList nList = root.getChildNodes();
+                for(int i = 0 ; i < nList.getLength() ; i++)
+                {
+                    Node temp1 = nList.item(i);
+                    if("Object".equals(temp1.getNodeName()))
+                    {
+                        NamedNodeMap attributes = temp1.getAttributes();
+                        for (int j = 0; j < attributes.getLength(); j++) 
+                        {
+                            Node attribute = attributes.item(j);
+                            if("TPContentGroupBox".equals(attribute.getNodeValue()))
+                            {
+                                NodeList nl = temp1.getChildNodes();
+                                for(int s = 0 ; s < nl.getLength(); s++)
+                                {
+                                    Node n2 = nl.item(s);
+                                    if("Object".equals(n2.getNodeName()))
+                                    {
+                                        NodeList n3 = n2.getChildNodes();
+                                        Tabs = getFormTabs1(n3);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else if ("Forms".equals(root.getNodeName()))
+            {
+                NodeList yy = root.getChildNodes();
+                for(int i = 0 ; i < yy.getLength(); i++)
+                {
+                    Node n1 = yy.item(i);
+                    //System.out.println("->" + n1.getNodeName());
+                    if(n1.getNodeName() == "Form")
+                    {
+                        NodeList NL1 = n1.getChildNodes();
+                        for(int l = 0 ; l < NL1.getLength(); l++)
+                        {
+                            Node n2 = NL1.item(l);
+                            //System.out.println("--->" + n2.getNodeName());
+                            if(n2.getNodeName() == "Object")
+                            {
+                                NodeList NL2 = n2.getChildNodes();
+                                for(int h = 0 ; h < NL2.getLength() ; h++)
+                                {
+                                    Node n4 = NL2.item(h);
+                                    //System.out.println("------>"+ n4.getNodeName());
+                                    if(n4.getNodeName() == "Object")
+                                    {
+                                        NamedNodeMap attr = n4.getAttributes();
+                                        for(int k = 0 ; k < attr.getLength() ; k++)
+                                        {
+                                            Node a1 = attr.item(k);
+                                            if("TPContentGroupBox".equals(a1.getNodeValue()))
+                                            {
+                                                NodeList ff = n4.getChildNodes();
+                                                for(int f = 0; f < ff.getLength();f++ )
+                                                {
+                                                    Node w = ff.item(f);
+                                                    //System.out.println("----------------->" + w.getNodeName());
+                                                    if(w.getNodeName() == "Object")
+                                                    {
+                                                        NodeList gg = w.getChildNodes();
+                                                        Tabs = getFormTabs1(gg);
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            else 
+                System.out.println("Неправильная структура файла");
+          
+          //System.out.println("Форма до изменения");    
+          //Show(Tabs);
+          
+          SetPosition(Tabs);
+          
+          //System.out.println("-----------------------------------------------------------------------------------------");
+          
+          //System.out.println("Форма после изменения");    
+          //Show(Tabs);
+          
+          String xmlString = getStringFromDoc(doc);
+          
+          Connection connection = DriverManager.getConnection("jdbc:default:connection");
+          PreparedStatement ps;
+          
+          if(form_kind == 3)
+          {
+                 ps = connection.prepareStatement("UPDATE USERFORMS SET FORM_DATA = ? WHERE RN = ?");
+          }
+          else
+                 ps = connection.prepareStatement("UPDATE USERFORMS SET FORM_DATA_EXT = ? WHERE RN = ?");
+          
+          ChangedXML = CLOB.createTemporary(connection, true, CLOB.DURATION_SESSION);
+          ChangedXML.open(CLOB.MODE_READWRITE);
+          
+          Writer wr = ChangedXML.getCharacterOutputStream();
+          wr.write(xmlString);
+          wr.flush();
+          wr.close();
+          //long nRN =  Integer.parseInt(rn);
+          ps.setClob(1, ChangedXML); 
+          ps.setBigDecimal(2, rn);
+          //ps.setInt(2, 817621);
+          ps.execute(); 
+           
+      }
+      catch (Exception e) 
+      {
+          e.printStackTrace();
+      }
+    }
+   private static Collection getFormTabs1 (NodeList nl2)
+    {
+        Collection Tabs = new ArrayList();
+        
+        for(int i = 0 ; i < nl2.getLength(); i++)
+        {
+            Node temp = nl2.item(i);
+            //System.out.println(temp.getNodeName() + " " + temp.getNodeValue());
+            if(temp.getNodeName() == "Object")
+            {
+                NamedNodeMap attributes = temp.getAttributes();
+                Node attr = attributes.getNamedItem("Class");
+                Node NameAttr = attributes.getNamedItem("Name");
+                
+                if("TPContentTabSheet".equals(attr.getNodeValue()))
+                {
+                    int GroupboxCount = 0 ;
+                    Tab t1 = new Tab();
+                    t1.Name = NameAttr.getNodeValue();
+                    NodeList tabs = temp.getChildNodes();
+                    for(int t = 0 ; t < tabs.getLength(); t++)
+                    {
+                        Node tb = tabs.item(t);
+                        //System.out.println("----->" + tb.getNodeName() + " " + tb.getNodeName());
+                        
+                        if(tb.getNodeName() == "Object")
+                        {
+                            NamedNodeMap attributes1 = tb.getAttributes();
+                            Node attr1 = attributes1.getNamedItem("Class");
+                            //Node NameAttr = attributes1.getNamedItem("Name");
+                            //t1.Name = NameAttr.getNodeValue();
+                                                        
+                            if("TPContainerGroupBox".equals(attr1.getNodeValue()))
+                            {
+                                System.out.println("THIS IS GROUPBOX");
+                                
+                                t1.Groupboxes.add(GetFormGroupBoxes(tb));
+                                t1.TabNode = temp;
+                                
+                                GroupboxCount = GroupboxCount + 1;
+                            }
+                            if("TPContentPageControl".equals(attr1.getNodeValue()))
+                            {
+                                System.out.println("THIS IS PAGE");
+                                
+                                NodeList tt = tb.getChildNodes();
+                                /*
+                                for(int m = 0 ; m < tt.getLength(); m++)
+                                {
+                                     System.out.println("-->" + tt.item(m).getNodeName());
+                                }*/
+                                
+                                t1.Tabs = getFormTabs1(tt);
+                                t1.TabNode = temp;
+                            }
+                        }
+                    }
+                    t1.GroupboxCount = GroupboxCount;
+                    Tabs.add(t1);
+                }
+                //System.out.println("=========================");
+            }
+        }
+        return Tabs;
+    }
+    
+   private static Groupbox GetFormGroupBoxes(Node Groupbox)
+    {
+        NodeList temp = Groupbox.getChildNodes();
+        Groupbox gb = new Groupbox();
+        
+        int AllComponentCount = 0 ;
+        int ComponentCount = 0;
+        
+        NamedNodeMap attributes = Groupbox.getAttributes();
+
+        gb.Name = attributes.getNamedItem("Name").getNodeValue();
+        gb.GroupboxNode = Groupbox;
+        
+        
+        for(int i = 0 ; i< temp.getLength(); i++)
+        {
+            Node nl = temp.item(i);
+            
+            if("Left".equals(nl.getNodeName()))
+            {
+                NodeList nl2 = nl.getChildNodes();
+                Node n2 = nl2.item(0);
+
+                NodeList nl3 = n2.getChildNodes();
+                Node n3 = nl3.item(0);
+                //System.out.println("Left -------- " /*+ n3.getNodeName() + " "*/ + n3.getNodeValue());
+
+                gb.Left = Integer.parseInt(n3.getNodeValue());
+            }
+
+            if("Top".equals(nl.getNodeName()))
+            {
+                NodeList nl2 = nl.getChildNodes();
+                Node n2 = nl2.item(0);
+
+                NodeList nl3 = n2.getChildNodes();
+                Node n3 = nl3.item(0);
+                //System.out.println("Top -------- " /*+ n3.getNodeName() + " "*/ + n3.getNodeValue());
+
+                gb.Top = Integer.parseInt(n3.getNodeValue());
+            }
+
+            if("Width".equals(nl.getNodeName()))
+            {
+                NodeList nl2 = nl.getChildNodes();
+                Node n2 = nl2.item(0);
+
+                NodeList nl3 = n2.getChildNodes();
+                Node n3 = nl3.item(0);
+                //System.out.println("Width -------- " /*+ n3.getNodeName() + " "*/ + n3.getNodeValue());
+
+                gb.Width = Integer.parseInt(n3.getNodeValue());
+            }
+            
+            if("Height".equals(nl.getNodeName()))
+            {
+                NodeList nl2 = nl.getChildNodes();
+                Node n2 = nl2.item(0);
+
+                NodeList nl3 = n2.getChildNodes();
+                Node n3 = nl3.item(0);
+                //System.out.println("Height ------- "/* + n3.getNodeName() + " "*/ + n3.getNodeValue());
+
+                gb.Height = Integer.parseInt(n3.getNodeValue());
+            }
+            
+            if("TabOrder".equals(nl.getNodeName()))
+            {
+                NodeList nl2 = nl.getChildNodes();
+                Node n2 = nl2.item(0);
+
+                NodeList nl3 = n2.getChildNodes();
+                Node n3 = nl3.item(0);
+                //System.out.println("Left -------- " /*+ n3.getNodeName() + " "*/ + n3.getNodeValue());
+
+                gb.TabOrder = Integer.parseInt(n3.getNodeValue());
+            }
+            
+            if("WebColumnsDefinition".equals(nl.getNodeName()))
+            {
+                NodeList nl2 = nl.getChildNodes();
+                Node n2 = nl2.item(0);
+                System.out.println("------------------ " + n2.getNodeName() + " " + n2.getNodeValue());
+
+                gb.WebColumnDefinition = n2.getNodeValue();
+
+                Pattern pattern = Pattern.compile("\\d+");
+                Matcher matcher = pattern.matcher(n2.getNodeValue());
+                int start = 0;
+                int ColumnsCount = 0;
+                while (matcher.find(start)) 
+                {
+                   String value = n2.getNodeValue().substring(matcher.start(), matcher.end());
+                   //int result = Integer.parseInt(value);
+                   //gb.ColumnsSize.add(result);
+                   start = matcher.end();
+                   ColumnsCount ++;
+                }
+                gb.ColumnsCount = ColumnsCount;
+                
+                float GbWidth = ((float) gb.Width) - 10;
+                float OnePercentFromGB = GbWidth / 100 ;
+                
+                int[] ColumnsSize = new int[ColumnsCount]; // массив размеров колонок В ПРОЦЕНТАХ
+                int[] ColumnsPXTemp = new int[ColumnsCount]; // массив размеров колонок В ПИКСЕЛЯХ
+                
+                int Temp = 0; // итератор
+                start = 0;
+                
+                while (matcher.find(start)) 
+                {
+                   String value = n2.getNodeValue().substring(matcher.start(), matcher.end());
+                   int result = Integer.parseInt(value);
+                   ColumnsSize[Temp] = result;
+                   float FPXColumn = OnePercentFromGB * result;
+                   ColumnsPXTemp[Temp] = (int)Math.floor(FPXColumn);
+                   
+                   start = matcher.end();
+                   Temp++;
+                }
+                
+                gb.Columns = ColumnsSize;
+                gb.ColumnsPX = ColumnsPXTemp;
+            }
+            
+            if("Object".equals(nl.getNodeName()))
+            {
+                NamedNodeMap attributes1 = nl.getAttributes();                           
+                Node attribute1 = attributes1.getNamedItem("Class");
+
+                if("TPContainerGroupBox".equals(attribute1.getNodeValue()))
+                {
+                    gb.Groupboxes.add(GetFormGroupBoxes(nl));
+                    AllComponentCount = AllComponentCount + 1;
+                }
+                else
+                {
+                    gb.Components.add(GetComponent(nl));
+                    ComponentCount = ComponentCount + 1;
+                    AllComponentCount = AllComponentCount + 1;
+                }
+            }     
+        }
+        
+        gb.ComponentCount = ComponentCount;
+        gb.AllComponentCount = AllComponentCount;
+        
+        if(gb.WebColumnDefinition == null)
+        {
+            gb.WebColumnDefinition = "100%";
+            gb.ColumnsCount = 1;
+            
+            int[] ColumnsSize = new int[1];
+            ColumnsSize[0] = 100;
+            gb.Columns = ColumnsSize;
+            
+            
+            float GbWidth = ((float) gb.Width);
+            int[] ColumnsPXTemp = new int[1];
+            ColumnsPXTemp[0] = (int)Math.floor(GbWidth);
+            gb.ColumnsPX = ColumnsPXTemp;
+        }
+        
+        gb.CollRows = GetGroupboxRows(gb);
+        System.out.println("GB = " + gb.Name + " " + gb.CollRows.size() );
+        
+        Row[] rows = new Row[gb.CollRows.size()];
+        
+        int pos = 0 ;
+        for(Iterator k = gb.CollRows.iterator(); k.hasNext();)
+        {
+            Row co = (Row)k.next();
+            rows[pos] = co; 
+            pos++;
+        }
+        gb.Rows = rows;
+       
+        return gb;
+    }  
+    
+    private static Collection GetGroupboxRows(Groupbox gb)
+    {
+        Collection Rows = new ArrayList();
+        Rows.clear();
+        Row r = new Row();
+        r.LabeLayout = "clNear"; 
+        
+        int CurrentRow = 0;
+        int ColumnsLeft = gb.ColumnsCount;
+        int Cursor = 0;
+        
+        for(int i = 0 ; i < gb.AllComponentCount; i++)
+        {
+            for(Iterator k = gb.Components.iterator(); k.hasNext();)
+            {
+                Component co = (Component)k.next();
+                
+                if(co.TabOrder == i)
+                {
+                    if (ColumnsLeft != 0)
+                    {
+                        if (co.WebColumnSpan <= ColumnsLeft)
+                        {
+                            if(co.ControlLabelLayout == "clAbove")
+                            {
+                                r.LabeLayout = "clAbove";
+                            }
+                            
+                            if(co.Height != 0)
+                            {
+                                r.isHigh = 1;
+                                r.rowHeight = co.Height;
+                            }
+                                
+                            Cursor = Cursor + co.WebColumnSpan;                         
+                            ColumnsLeft = ColumnsLeft - co.WebColumnSpan; 
+                            
+                            
+                            if(Cursor == gb.ColumnsCount || co.TabOrder == gb.ComponentCount - 1)
+                            {
+                                Rows.add(r);                           
+                                CurrentRow = CurrentRow + 1;
+                                ColumnsLeft = gb.ColumnsCount;
+                                Cursor = 0 ;                                    
+                                Row r2 = new Row();
+                                r2.LabeLayout = "clNear";
+                                r2.isHigh = 0 ;
+                                r2.rowHeight = 0;
+                                r = r2;
+                            } 
+                            /*
+                            if(ColumnsLeft != 0 && co.TabOrder == gb.AllComponentCount -1)
+                            {
+                                Rows.add(r);                           
+                            }*/
+                        }
+                        else
+                        {
+                            //если элемент занимает больше места чем осталось в строке 
+                            
+                            // 1. Добавление текущей строки в коллекцию (ту в которой не хватает колонок для элемента "co")
+                            // и обнуление объекта
+                            Rows.add(r);                           
+                            CurrentRow = CurrentRow + 1;
+                            ColumnsLeft = gb.ColumnsCount;
+                            Cursor = 0 ;                                    
+                            Row r2 = new Row();
+                            r2.LabeLayout = "clNear";
+                            r2.isHigh = 0 ;
+                            r2.rowHeight = 0;
+                            r = r2;
+                            
+                            // установка элемента в новую строку
+                            Cursor = Cursor + co.WebColumnSpan;                         
+                            ColumnsLeft = ColumnsLeft - co.WebColumnSpan; 
+                            
+                            // задание параметров новому объекту строки "row"
+                            if(co.ControlLabelLayout == "clAbove")
+                            {
+                                r.LabeLayout = "clAbove";
+                            }
+                            if(co.Height != 0)
+                            {
+                                r.isHigh = 1;
+                                r.rowHeight = co.Height;
+                            }
+                            
+                            if(Cursor == gb.ColumnsCount || co.TabOrder == gb.ComponentCount-1)
+                            {
+                                Rows.add(r);                           
+                                CurrentRow = CurrentRow + 1;
+                                ColumnsLeft = gb.ColumnsCount;
+                                Cursor = 0 ;                                    
+                                Row r3 = new Row();
+                                r3.LabeLayout = "clNear";
+                                r3.isHigh = 0 ;
+                                r3.rowHeight = 0;
+                                r = r3;
+                            }                              
+                        }
+                    }
+                    else
+                    {
+                        
+                        CurrentRow = CurrentRow + 1;
+                        ColumnsLeft = gb.ColumnsCount;
+                        Cursor = 0 ;
+                    } 
+                }
+            }
+        }
+                
+        return Rows;
+    }
+    
+   private static Component GetComponent(Node n)
+    {
+        Component c = new Component();
+        
+        c.ComponentNode = n;
+        
+        NamedNodeMap attributes1 = n.getAttributes();
+
+        c.Type = attributes1.getNamedItem("Class").getNodeValue();
+        c.Name = attributes1.getNamedItem("Name").getNodeValue();
+        
+        NodeList nl = n.getChildNodes();
+        
+        for(int i = 0 ; i< nl.getLength(); i++)
+        {
+            Node cur = nl.item(i);
+            //System.out.println("....................... " + cur.getNodeName());
+            
+            if("Hint".equals(cur.getNodeName()))
+            {   
+                NodeList temp = cur.getChildNodes();
+                
+                c.Hint = temp.item(0).getNodeValue();
+            }
+                        
+            if("Left".equals(cur.getNodeName()))
+            {
+                NodeList temp1 = cur.getChildNodes();
+                
+                NodeList nlist = temp1.item(0).getChildNodes();
+                //System.out.println("=>" + nlist.item(0).getNodeValue());
+                
+                c.Left = Integer.parseInt(nlist.item(0).getNodeValue());
+            }
+            if("Top".equals(cur.getNodeName()))
+            {
+                NodeList temp1 = cur.getChildNodes();
+                
+                NodeList nlist = temp1.item(0).getChildNodes();
+                //System.out.println("=>" + nlist.item(0).getNodeValue());
+                
+                c.Top = Integer.parseInt(nlist.item(0).getNodeValue());
+            }
+            if("Width".equals(cur.getNodeName()))
+            {
+                NodeList temp1 = cur.getChildNodes();
+                
+                NodeList nlist = temp1.item(0).getChildNodes();
+                //System.out.println("=>" + nlist.item(0).getNodeValue());
+                
+                c.Width = Integer.parseInt(nlist.item(0).getNodeValue());
+            }
+            if("Height".equals(cur.getNodeName()))
+            {
+                NodeList temp1 = cur.getChildNodes();
+                
+                NodeList nlist = temp1.item(0).getChildNodes();
+                //System.out.println("=>" + nlist.item(0).getNodeValue());
+                
+                c.Height = Integer.parseInt(nlist.item(0).getNodeValue());
+            }
+            if("WebColumnSpan".equals(cur.getNodeName()))
+            {
+                NodeList temp1 = cur.getChildNodes();               
+                NodeList nlist = temp1.item(0).getChildNodes();
+
+                if("0".equals(nlist.item(0).getNodeValue()))
+                {
+                    c.WebColumnSpan = 1;
+                }
+                else
+                    c.WebColumnSpan = Integer.parseInt(nlist.item(0).getNodeValue());
+            }
+            if("TabOrder".equals(cur.getNodeName()))
+            {
+                NodeList temp1 = cur.getChildNodes();
+                
+                NodeList nlist = temp1.item(0).getChildNodes();
+                //System.out.println("=>" + nlist.item(0).getNodeValue());
+                
+                c.TabOrder = Integer.parseInt(nlist.item(0).getNodeValue());
+            }
+            if("ControlLabel.Position".equals(cur.getNodeName()))
+            {
+                NodeList temp1 = cur.getChildNodes();
+                
+                NodeList nlist = temp1.item(0).getChildNodes();
+                
+                c.ControlLabelPosition = Integer.parseInt(nlist.item(0).getNodeValue());
+            }
+            
+            if("ControlLabel.Text".equals(cur.getNodeName()))
+            {
+                NodeList temp1 = cur.getChildNodes();
+                
+                c.ControlLabelText = temp1.item(0).getNodeValue();
+            }
+            
+            if("ControlLabel.WebSize".equals(cur.getNodeName()))
+            {
+                NodeList temp1 = cur.getChildNodes();
+                double d = 0;
+                String WebSize = temp1.item(0).getNodeValue();
+                
+                Pattern p = Pattern.compile("(\\d+(?:\\.\\d+))");
+                Matcher m = p.matcher(WebSize);
+                while(m.find()) 
+                {
+                    d = Double.parseDouble(m.group(1));
+                }
+                
+                c.ControlLabelWebSize = WebSize;
+                
+            }            
+            if("ControlLabel.Layout".equals(cur.getNodeName()))
+            {
+                if("clAbove".equals(cur.getFirstChild().getNodeValue()))
+                {
+                    c.ControlLabelLayout = "clAbove";
+                }
+                else
+                    c.ControlLabelLayout = "clNear";
+            }            
+        }
+        if(c.ControlLabelLayout == null)
+        {
+            if("TPContentMemo".equals(c.Type))
+            {
+                c.ControlLabelLayout = "clAbove";
+            }
+            else
+                c.ControlLabelLayout = "clNear";
+        }
+        return c;
+    }
+    
+   private static void SetPosition(Collection Tabs)
+    {
+        for (Iterator i = Tabs.iterator(); i.hasNext();)
+        {
+            // верхняя и левая граница позиций групбоксов
+            GBStartPositionTop = 0;
+            GBStartPositionLeft = 5;
+            
+            Tab tb = (Tab)i.next();
+            
+            if(!tb.Tabs.isEmpty())
+            {
+                SetPosition(tb.Tabs);
+            }
+            
+            for(int j = 0 ; j < tb.GroupboxCount; j++)
+            {
+                for (Iterator m = tb.Groupboxes.iterator(); m.hasNext();)
+                {
+                    Groupbox gb = (Groupbox)m.next();
+                    if(gb.TabOrder == j)
+                    {
+                        SetParametersGroupbox1(gb , GBStartPositionTop, GBStartPositionLeft);
+                        GBStartPositionTop = GBStartPositionTop + gb.Height + 2;
+                    }
+                }
+            }                
+        }
+    }
+    
+    private static Groupbox SetParametersGroupbox1(Groupbox gb, int GBStartPositionTop, int GBStartPositionLeft)
+    {
+       //преобразование в тип float и вычитаем отступы по 5px с каждой стороны
+       float FWidth = ((float) gb.Width) - 10;
+        
+       //вычесение 1% от доступного места в групбоксе (с учётом отступов по 5px)
+       float OnePercentFromGB = FWidth / 100 ;
+        
+       int ColumnsLeft = gb.ColumnsCount;
+       int CurrentRow = 1; 
+       int Cursor = 0;
+      
+       int RowTop = 16;
+       
+       gb.setTop(GBStartPositionTop);
+       gb.setLeft(GBStartPositionLeft);
+       
+       for(int i = 0 ; i < gb.AllComponentCount; i++)
+       {
+            boolean flag = false;
+            for (Iterator k = gb.Components.iterator(); k.hasNext();)
+            {
+                Component co = (Component)k.next();
+                if(co.TabOrder == i)
+                {
+                    flag = true;
+                    if(ColumnsLeft != 0)
+                    {
+                        if(co.WebColumnSpan > ColumnsLeft)
+                        {
+                            if(gb.Rows[CurrentRow -1].LabeLayout == "clAbove")
+                            {
+                                RowTop = RowTop + 10;
+                            }
+
+                            if(gb.Rows[CurrentRow-1].isHigh == 0)
+                            {
+                                RowTop = RowTop + 21 + 4;
+                                CurrentRow = CurrentRow + 1;                            
+                            }
+                            else 
+                            {
+                                RowTop = RowTop + gb.Rows[CurrentRow-1].rowHeight + 4;
+                                CurrentRow = CurrentRow + 1;
+                            }
+                            Cursor = 0;
+                            ColumnsLeft = gb.ColumnsCount;
+                        }
+
+
+                        //установка высоты контрола согласно положения его метки --------------------- 
+                        if(gb.Rows[CurrentRow - 1].LabeLayout == "clAbove")
+                        {
+                            co.setTop(RowTop + 10);
+                        }
+                        else
+                        {
+                            co.setTop(RowTop);
+                            System.out.println("->" + RowTop);
+                        }  
+                        //-----------------------------------------------------------------------------
+                        
+                        //---------------если параметр HINT = 1 ---------------------------------------
+                        if("1".equals(co.Hint))
+                        {
+                            if(co.WebColumnSpan != 1)
+                            {
+                                int ComponentPersentTake = 0 ;
+                                for(int s = Cursor ; s < Cursor + co.WebColumnSpan ; s++)
+                                {
+                                    ComponentPersentTake = ComponentPersentTake + gb.ColumnsPX[s];
+                                }
+                                
+                                co.setWidth(ComponentPersentTake - co.Left + 2);
+                                co.deleteHintNodeAfterAlign();
+                            }
+                        }
+                        else
+                        {
+                            //установка левого отступа контрола--------------------------------------------
+                            int PercentTake = 0;
+                            for(int t = 0 ; t < Cursor + co.WebColumnSpan ; t++ )
+                            {
+                                PercentTake = PercentTake + gb.Columns[t];
+                            }
+                            //необходимая ширина для контрола
+                            float FWidthNeed = OnePercentFromGB * PercentTake;
+                            //пересчёт в INT
+                            int WidthNeed = (int)Math.floor(FWidthNeed);
+                            //координата Left текущего контрола 
+                            int CLeft = WidthNeed - co.Width;
+                            //если координата Left меньше чем 0
+                            /*if(CLeft < 0)
+                            {
+                                CLeft = 10;
+                            }*/
+                            co.setLeft(CLeft);
+                        }
+                        
+                        
+                        //------------------------------------------------------------------------------
+
+
+
+                        //----------------------------------------LABEL WEB SIZE------------------------
+                        if(co.ControlLabelText != "" || co.ControlLabelText != null)
+                        {
+                            int ComponentPXSize = 0;
+
+                            for(int w = Cursor ; w < Cursor + co.WebColumnSpan ; w++)
+                            {
+                                ComponentPXSize = ComponentPXSize + gb.ColumnsPX[w];
+                            }
+                            double OnePercentForComponent = ComponentPXSize / 100.00;
+                            int LabelPXNeed = ComponentPXSize - co.Width;
+                            double LabelPercentNeed = LabelPXNeed / OnePercentForComponent;
+                            String formattedDouble = new DecimalFormat("#0.00000").format(LabelPercentNeed);
+                            co.setControlLabelWebSize(formattedDouble + "%");
+                        }
+                        //-------------------------------------------------------------------------------
+
+
+
+                        //--------------------------------------LABEL POSITION---------------------------
+                        if(co.ControlLabelText != "" || co.ControlLabelText != null)
+                        {
+                            int LabelPosition = 0;
+                            int LeftIndent = 0;
+
+                            for(int c = 0 ; c < Cursor ; c++)
+                            {
+                                LeftIndent = LeftIndent + gb.ColumnsPX[c];
+                            }
+
+                            LabelPosition = LeftIndent + 10;                           
+                            co.setLabelPosition(LabelPosition);
+                        }
+                        //------------------------------------------------------------------------------
+
+
+                        //изменение параметров позиционирования после размещения------------------------
+                        Cursor = Cursor + co.WebColumnSpan;
+                        ColumnsLeft = ColumnsLeft - co.WebColumnSpan;
+                        //------------------------------------------------------------------------------
+
+
+                        //если курсор равен количеству доступных колонок--------------------------------
+                        if(Cursor == gb.ColumnsCount)
+                        {
+                            if(gb.Rows[CurrentRow -1].LabeLayout == "clAbove")
+                            {
+                                RowTop = RowTop + 10;
+                            }
+
+                            if(gb.Rows[CurrentRow-1].isHigh == 0)
+                            {
+                                RowTop = RowTop + 21 + 4;
+                                CurrentRow = CurrentRow + 1;                            
+                            }
+                            else 
+                            {
+                                RowTop = RowTop + gb.Rows[CurrentRow-1].rowHeight + 4;
+                                CurrentRow = CurrentRow + 1;
+                            }
+                            Cursor = 0;
+                        }
+
+
+                        //если не осталось ни одной колонки для размещения элементов-------------------
+                        if(ColumnsLeft == 0)
+                        {
+                            ColumnsLeft = gb.ColumnsCount;
+                        } 
+
+
+                        //если элемент последний -------------------------------------------------------
+                        if(co.TabOrder == gb.AllComponentCount - 1)
+                        {
+                            if(Cursor == 0)
+                            {
+                                RowTop = RowTop + 7;   
+                                gb.setHeight(RowTop);
+                            }
+                            else if (Cursor != gb.ColumnsCount)
+                            {
+                                if(gb.Rows[CurrentRow -2].LabeLayout == "clAbove")
+                                {
+                                    RowTop = RowTop + 10;
+                                }
+
+                                if(gb.Rows[CurrentRow-2].isHigh == 0)
+                                {
+                                    RowTop = RowTop + 21 + 4;                       
+                                }
+                                else 
+                                {
+                                    RowTop = RowTop + gb.Rows[CurrentRow-2].rowHeight + 4;
+                                }
+                                Cursor = 0;
+                                RowTop = RowTop + 7; 
+                                gb.setHeight(RowTop);
+                            }
+                        }
+                    }
+                    else
+                    {
+                        if(gb.Rows[CurrentRow-1].isHigh == 0)
+                        {
+                            RowTop = RowTop + 21 + 4;
+                            CurrentRow = CurrentRow + 1;                            
+                        }
+                        else 
+                        {
+                            RowTop = RowTop + gb.Rows[CurrentRow-1].rowHeight + 4;
+                            CurrentRow = CurrentRow + 1;
+                        }
+                        Cursor = 0;
+                    }
+                }
+            }
+            if(flag == false)
+            {
+                for(Iterator j = gb.Groupboxes.iterator(); j.hasNext();)
+                {
+                    Groupbox g = (Groupbox)j.next();
+                    if(g.TabOrder == i)
+                    {
+                        flag = true;
+                        
+                        GBStartPositionTop = RowTop;
+                        
+                        SetParametersGroupbox1(g, GBStartPositionTop, GBStartPositionLeft);
+                        RowTop = RowTop + g.Height + 4;
+                        GBStartPositionTop = RowTop;
+                        
+                        //если групбокс является последним элементом среди
+                        //всех элементов на родительском групбоксе
+                        if(g.TabOrder == gb.AllComponentCount - 1)
+                        {
+                            RowTop = RowTop + 7; 
+                            gb.setHeight(RowTop);
+                        }
+                    }
+                }
+            }
+       }
+       return gb;
+   }
+   
+   private static void Show (Collection Tabs)
+   {
+        for (Iterator i = Tabs.iterator(); i.hasNext();)
+        {   
+            Tab tb = (Tab)i.next();
+            System.out.println("--- " + tb.Name +" Width: "+ tb.Width + " Height: " + tb.Height);
+
+
+            if(!tb.Tabs.isEmpty())
+            {
+                Show(tb.Tabs);
+            }
+
+            for (Iterator j = tb.Groupboxes.iterator(); j.hasNext();)
+            {
+                Groupbox gb = (Groupbox)j.next();
+                System.out.println("------ " + "Groupbox: "+ gb.Name + " ComponentCount: " + gb.ComponentCount + " Top: " + gb.Top + " Left: "+ gb.Left + " Высота: "+ gb.Width + " Ширина: " + gb.Height);
+
+                for (Iterator k = gb.Components.iterator(); k.hasNext();)
+                {
+                    Component co = (Component)k.next();
+                    System.out.println("--------- " + "Element: " + co.Name + " TabOrder " + co.TabOrder + " Left: " + co.Left + " Top: " + co.Top + " Width: " + co.Width );
+                }
+                System.out.println("-------------------------------------------------------------------------"); 
+            }
+            System.out.println("-------------------------------------------------------------------------"); 
+        }
+    }
+}
+
