@@ -118,40 +118,26 @@ public class Groupbox
 {
     public String Name;
     
-    public int Left;   // левый отступ
-    public int Top;    // верхний отступ
-    public int Width;  // ширина
-    public int Height; //высота
+    public int Left;   
+    public int Top;    
+    public int Width;  
+    public int Height; 
     
-    public int TabOrder;  // номер при обходе
-    
-    //количество контролов
+    public int TabOrder;  
     public int ComponentCount;
-    
-    //количество элементов в групбоксе включая дочерние групбоксы
+   
     public int AllComponentCount;
     
     public String WebColumnDefinition;
     
-    //public Collection ColumnsSize = new ArrayList();
-    //public int[] ColumnsSize;
     public int ColumnsCount;
     
-    //колонки групбокса в процентах
     public int[] Columns;
-    
-    //колонки групбокса в пикселях
-    public int[] ColumnsPX;
-    
-    //массив строк компонентов 
+    public int[] ColumnsPX;   
     public Row[] Rows;
     
     public Collection CollRows = new ArrayList();
-    
-    //коллекция компонентов которые есть в групбоксе
     public Collection Components = new ArrayList();
-    
-    //коллекция групбоксов в данном группбоксе (если имеются)
     public Collection Groupboxes = new ArrayList();
     
     public Node GroupboxNode;
@@ -265,18 +251,8 @@ public class Groupbox
 
 public class Row 
 {
-    // Если положение метки на каком либо элементе в строке
-    // находится сверху, значение данного поля будет "clAbove"
-    // в другом случае (по умолчанию) "clNear"
-    
     public String LabeLayout ;
-    
-    // Если в строке наёден элемент с высотой больше чем 0 (21px) 
-    // свойство "isHigh" равно 0, в другом случае (по умолчанию) равно 0
-    
     public int isHigh;
-    
-    
     public int rowHeight;
 }
 
@@ -450,7 +426,6 @@ public class Component
                     {
                         if(val != 10)
                         {
-
                                 Node target = null;
                                 for(int j = 0 ; j < parameters.getLength(); j++)
                                 {
@@ -462,7 +437,6 @@ public class Component
                                     }
                                 }
                                 Element el = doc.createElement("ControlLabel.Position");
-                                //this.ComponentNode.appendChild(el);
                                 if(target != null)
                                 {
                                     this.ComponentNode.insertBefore(el, target);
@@ -536,9 +510,7 @@ public class Component
 public class Aligner 
 { 
    public static int GBStartPositionTop;
-    
    public static int GBStartPositionLeft;
-    
    public static Document doc;
     
    public static String getStringFromDoc(org.w3c.dom.Document doc)    
@@ -578,7 +550,7 @@ public class Aligner
           
           if("Object".equals(root.getNodeName()))
             {
-                System.out.println("Это обычная форма");
+                System.out.println("ГќГІГ® Г®ГЎГ»Г·Г­Г Гї ГґГ®Г°Г¬Г ");
                 NodeList nList = root.getChildNodes();
                 for(int i = 0 ; i < nList.getLength() ; i++)
                 {
@@ -612,21 +584,18 @@ public class Aligner
                 for(int i = 0 ; i < yy.getLength(); i++)
                 {
                     Node n1 = yy.item(i);
-                    //System.out.println("->" + n1.getNodeName());
                     if(n1.getNodeName() == "Form")
                     {
                         NodeList NL1 = n1.getChildNodes();
                         for(int l = 0 ; l < NL1.getLength(); l++)
                         {
                             Node n2 = NL1.item(l);
-                            //System.out.println("--->" + n2.getNodeName());
                             if(n2.getNodeName() == "Object")
                             {
                                 NodeList NL2 = n2.getChildNodes();
                                 for(int h = 0 ; h < NL2.getLength() ; h++)
                                 {
                                     Node n4 = NL2.item(h);
-                                    //System.out.println("------>"+ n4.getNodeName());
                                     if(n4.getNodeName() == "Object")
                                     {
                                         NamedNodeMap attr = n4.getAttributes();
@@ -639,7 +608,6 @@ public class Aligner
                                                 for(int f = 0; f < ff.getLength();f++ )
                                                 {
                                                     Node w = ff.item(f);
-                                                    //System.out.println("----------------->" + w.getNodeName());
                                                     if(w.getNodeName() == "Object")
                                                     {
                                                         NodeList gg = w.getChildNodes();
@@ -656,18 +624,9 @@ public class Aligner
                 }
             }
             else 
-                System.out.println("Неправильная структура файла");
-          
-          //System.out.println("Форма до изменения");    
-          //Show(Tabs);
+                System.out.println("ГЌГҐГЇГ°Г ГўГЁГ«ГјГ­Г Гї Г±ГІГ°ГіГЄГІГіГ°Г  ГґГ Г©Г«Г ");
           
           SetPosition(Tabs);
-          
-          //System.out.println("-----------------------------------------------------------------------------------------");
-          
-          //System.out.println("Форма после изменения");    
-          //Show(Tabs);
-          
           String xmlString = getStringFromDoc(doc);
           
           Connection connection = DriverManager.getConnection("jdbc:default:connection");
@@ -687,10 +646,8 @@ public class Aligner
           wr.write(xmlString);
           wr.flush();
           wr.close();
-          //long nRN =  Integer.parseInt(rn);
           ps.setClob(1, ChangedXML); 
           ps.setBigDecimal(2, rn);
-          //ps.setInt(2, 817621);
           ps.execute(); 
            
       }
@@ -706,7 +663,6 @@ public class Aligner
         for(int i = 0 ; i < nl2.getLength(); i++)
         {
             Node temp = nl2.item(i);
-            //System.out.println(temp.getNodeName() + " " + temp.getNodeValue());
             if(temp.getNodeName() == "Object")
             {
                 NamedNodeMap attributes = temp.getAttributes();
@@ -722,14 +678,10 @@ public class Aligner
                     for(int t = 0 ; t < tabs.getLength(); t++)
                     {
                         Node tb = tabs.item(t);
-                        //System.out.println("----->" + tb.getNodeName() + " " + tb.getNodeName());
-                        
                         if(tb.getNodeName() == "Object")
                         {
                             NamedNodeMap attributes1 = tb.getAttributes();
                             Node attr1 = attributes1.getNamedItem("Class");
-                            //Node NameAttr = attributes1.getNamedItem("Name");
-                            //t1.Name = NameAttr.getNodeValue();
                                                         
                             if("TPContainerGroupBox".equals(attr1.getNodeValue()))
                             {
@@ -745,11 +697,6 @@ public class Aligner
                                 System.out.println("THIS IS PAGE");
                                 
                                 NodeList tt = tb.getChildNodes();
-                                /*
-                                for(int m = 0 ; m < tt.getLength(); m++)
-                                {
-                                     System.out.println("-->" + tt.item(m).getNodeName());
-                                }*/
                                 
                                 t1.Tabs = getFormTabs1(tt);
                                 t1.TabNode = temp;
@@ -759,7 +706,6 @@ public class Aligner
                     t1.GroupboxCount = GroupboxCount;
                     Tabs.add(t1);
                 }
-                //System.out.println("=========================");
             }
         }
         return Tabs;
@@ -790,8 +736,6 @@ public class Aligner
 
                 NodeList nl3 = n2.getChildNodes();
                 Node n3 = nl3.item(0);
-                //System.out.println("Left -------- " /*+ n3.getNodeName() + " "*/ + n3.getNodeValue());
-
                 gb.Left = Integer.parseInt(n3.getNodeValue());
             }
 
@@ -802,7 +746,6 @@ public class Aligner
 
                 NodeList nl3 = n2.getChildNodes();
                 Node n3 = nl3.item(0);
-                //System.out.println("Top -------- " /*+ n3.getNodeName() + " "*/ + n3.getNodeValue());
 
                 gb.Top = Integer.parseInt(n3.getNodeValue());
             }
@@ -814,7 +757,6 @@ public class Aligner
 
                 NodeList nl3 = n2.getChildNodes();
                 Node n3 = nl3.item(0);
-                //System.out.println("Width -------- " /*+ n3.getNodeName() + " "*/ + n3.getNodeValue());
 
                 gb.Width = Integer.parseInt(n3.getNodeValue());
             }
@@ -826,7 +768,6 @@ public class Aligner
 
                 NodeList nl3 = n2.getChildNodes();
                 Node n3 = nl3.item(0);
-                //System.out.println("Height ------- "/* + n3.getNodeName() + " "*/ + n3.getNodeValue());
 
                 gb.Height = Integer.parseInt(n3.getNodeValue());
             }
@@ -838,7 +779,6 @@ public class Aligner
 
                 NodeList nl3 = n2.getChildNodes();
                 Node n3 = nl3.item(0);
-                //System.out.println("Left -------- " /*+ n3.getNodeName() + " "*/ + n3.getNodeValue());
 
                 gb.TabOrder = Integer.parseInt(n3.getNodeValue());
             }
@@ -847,7 +787,6 @@ public class Aligner
             {
                 NodeList nl2 = nl.getChildNodes();
                 Node n2 = nl2.item(0);
-                System.out.println("------------------ " + n2.getNodeName() + " " + n2.getNodeValue());
 
                 gb.WebColumnDefinition = n2.getNodeValue();
 
@@ -858,8 +797,6 @@ public class Aligner
                 while (matcher.find(start)) 
                 {
                    String value = n2.getNodeValue().substring(matcher.start(), matcher.end());
-                   //int result = Integer.parseInt(value);
-                   //gb.ColumnsSize.add(result);
                    start = matcher.end();
                    ColumnsCount ++;
                 }
@@ -868,10 +805,10 @@ public class Aligner
                 float GbWidth = ((float) gb.Width) - 10;
                 float OnePercentFromGB = GbWidth / 100 ;
                 
-                int[] ColumnsSize = new int[ColumnsCount]; // массив размеров колонок В ПРОЦЕНТАХ
-                int[] ColumnsPXTemp = new int[ColumnsCount]; // массив размеров колонок В ПИКСЕЛЯХ
+                int[] ColumnsSize = new int[ColumnsCount]; // Г¬Г Г±Г±ГЁГў Г°Г Г§Г¬ГҐГ°Г®Гў ГЄГ®Г«Г®Г­Г®ГЄ Г‚ ГЏГђГЋГ–Г…ГЌГ’ГЂГ•
+                int[] ColumnsPXTemp = new int[ColumnsCount]; // Г¬Г Г±Г±ГЁГў Г°Г Г§Г¬ГҐГ°Г®Гў ГЄГ®Г«Г®Г­Г®ГЄ Г‚ ГЏГ€ГЉГ‘Г…Г‹ГџГ•
                 
-                int Temp = 0; // итератор
+                int Temp = 0; 
                 start = 0;
                 
                 while (matcher.find(start)) 
@@ -1003,10 +940,6 @@ public class Aligner
                         }
                         else
                         {
-                            //если элемент занимает больше места чем осталось в строке 
-                            
-                            // 1. Добавление текущей строки в коллекцию (ту в которой не хватает колонок для элемента "co")
-                            // и обнуление объекта
                             Rows.add(r);                           
                             CurrentRow = CurrentRow + 1;
                             ColumnsLeft = gb.ColumnsCount;
@@ -1017,11 +950,9 @@ public class Aligner
                             r2.rowHeight = 0;
                             r = r2;
                             
-                            // установка элемента в новую строку
                             Cursor = Cursor + co.WebColumnSpan;                         
                             ColumnsLeft = ColumnsLeft - co.WebColumnSpan; 
                             
-                            // задание параметров новому объекту строки "row"
                             if(co.ControlLabelLayout == "clAbove")
                             {
                                 r.LabeLayout = "clAbove";
@@ -1076,49 +1007,35 @@ public class Aligner
         for(int i = 0 ; i< nl.getLength(); i++)
         {
             Node cur = nl.item(i);
-            //System.out.println("....................... " + cur.getNodeName());
             
             if("Hint".equals(cur.getNodeName()))
             {   
                 NodeList temp = cur.getChildNodes();
-                
                 c.Hint = temp.item(0).getNodeValue();
             }
                         
             if("Left".equals(cur.getNodeName()))
             {
                 NodeList temp1 = cur.getChildNodes();
-                
                 NodeList nlist = temp1.item(0).getChildNodes();
-                //System.out.println("=>" + nlist.item(0).getNodeValue());
-                
                 c.Left = Integer.parseInt(nlist.item(0).getNodeValue());
             }
             if("Top".equals(cur.getNodeName()))
             {
                 NodeList temp1 = cur.getChildNodes();
-                
                 NodeList nlist = temp1.item(0).getChildNodes();
-                //System.out.println("=>" + nlist.item(0).getNodeValue());
-                
                 c.Top = Integer.parseInt(nlist.item(0).getNodeValue());
             }
             if("Width".equals(cur.getNodeName()))
             {
                 NodeList temp1 = cur.getChildNodes();
-                
                 NodeList nlist = temp1.item(0).getChildNodes();
-                //System.out.println("=>" + nlist.item(0).getNodeValue());
-                
                 c.Width = Integer.parseInt(nlist.item(0).getNodeValue());
             }
             if("Height".equals(cur.getNodeName()))
             {
                 NodeList temp1 = cur.getChildNodes();
-                
                 NodeList nlist = temp1.item(0).getChildNodes();
-                //System.out.println("=>" + nlist.item(0).getNodeValue());
-                
                 c.Height = Integer.parseInt(nlist.item(0).getNodeValue());
             }
             if("WebColumnSpan".equals(cur.getNodeName()))
@@ -1136,25 +1053,19 @@ public class Aligner
             if("TabOrder".equals(cur.getNodeName()))
             {
                 NodeList temp1 = cur.getChildNodes();
-                
                 NodeList nlist = temp1.item(0).getChildNodes();
-                //System.out.println("=>" + nlist.item(0).getNodeValue());
-                
                 c.TabOrder = Integer.parseInt(nlist.item(0).getNodeValue());
             }
             if("ControlLabel.Position".equals(cur.getNodeName()))
             {
                 NodeList temp1 = cur.getChildNodes();
-                
                 NodeList nlist = temp1.item(0).getChildNodes();
-                
                 c.ControlLabelPosition = Integer.parseInt(nlist.item(0).getNodeValue());
             }
             
             if("ControlLabel.Text".equals(cur.getNodeName()))
             {
                 NodeList temp1 = cur.getChildNodes();
-                
                 c.ControlLabelText = temp1.item(0).getNodeValue();
             }
             
@@ -1200,7 +1111,6 @@ public class Aligner
     {
         for (Iterator i = Tabs.iterator(); i.hasNext();)
         {
-            // верхняя и левая граница позиций групбоксов
             GBStartPositionTop = 0;
             GBStartPositionLeft = 5;
             
@@ -1228,10 +1138,8 @@ public class Aligner
     
     private static Groupbox SetParametersGroupbox1(Groupbox gb, int GBStartPositionTop, int GBStartPositionLeft)
     {
-       //преобразование в тип float и вычитаем отступы по 5px с каждой стороны
        float FWidth = ((float) gb.Width) - 10;
         
-       //вычесение 1% от доступного места в групбоксе (с учётом отступов по 5px)
        float OnePercentFromGB = FWidth / 100 ;
         
        int ColumnsLeft = gb.ColumnsCount;
@@ -1276,7 +1184,6 @@ public class Aligner
                         }
 
 
-                        //установка высоты контрола согласно положения его метки --------------------- 
                         if(gb.Rows[CurrentRow - 1].LabeLayout == "clAbove")
                         {
                             co.setTop(RowTop + 10);
@@ -1286,9 +1193,7 @@ public class Aligner
                             co.setTop(RowTop);
                             System.out.println("->" + RowTop);
                         }  
-                        //-----------------------------------------------------------------------------
                         
-                        //---------------если параметр HINT = 1 ---------------------------------------
                         if("1".equals(co.Hint))
                         {
                             if(co.WebColumnSpan != 1)
@@ -1305,26 +1210,24 @@ public class Aligner
                         }
                         else
                         {
-                            //установка левого отступа контрола--------------------------------------------
                             int PercentTake = 0;
                             for(int t = 0 ; t < Cursor + co.WebColumnSpan ; t++ )
                             {
                                 PercentTake = PercentTake + gb.Columns[t];
                             }
-                            //необходимая ширина для контрола
+                            //Г­ГҐГ®ГЎГµГ®Г¤ГЁГ¬Г Гї ГёГЁГ°ГЁГ­Г  Г¤Г«Гї ГЄГ®Г­ГІГ°Г®Г«Г 
                             float FWidthNeed = OnePercentFromGB * PercentTake;
-                            //пересчёт в INT
+                            //ГЇГҐГ°ГҐГ±Г·ВёГІ Гў INT
                             int WidthNeed = (int)Math.floor(FWidthNeed);
-                            //координата Left текущего контрола 
+                            //ГЄГ®Г®Г°Г¤ГЁГ­Г ГІГ  Left ГІГҐГЄГіГ№ГҐГЈГ® ГЄГ®Г­ГІГ°Г®Г«Г  
                             int CLeft = WidthNeed - co.Width;
-                            //если координата Left меньше чем 0
+                            //ГҐГ±Г«ГЁ ГЄГ®Г®Г°Г¤ГЁГ­Г ГІГ  Left Г¬ГҐГ­ГјГёГҐ Г·ГҐГ¬ 0
                             /*if(CLeft < 0)
                             {
                                 CLeft = 10;
                             }*/
                             co.setLeft(CLeft);
                         }
-                        
                         
                         //------------------------------------------------------------------------------
 
@@ -1366,13 +1269,11 @@ public class Aligner
                         //------------------------------------------------------------------------------
 
 
-                        //изменение параметров позиционирования после размещения------------------------
                         Cursor = Cursor + co.WebColumnSpan;
                         ColumnsLeft = ColumnsLeft - co.WebColumnSpan;
                         //------------------------------------------------------------------------------
 
 
-                        //если курсор равен количеству доступных колонок--------------------------------
                         if(Cursor == gb.ColumnsCount)
                         {
                             if(gb.Rows[CurrentRow -1].LabeLayout == "clAbove")
@@ -1394,14 +1295,12 @@ public class Aligner
                         }
 
 
-                        //если не осталось ни одной колонки для размещения элементов-------------------
                         if(ColumnsLeft == 0)
                         {
                             ColumnsLeft = gb.ColumnsCount;
                         } 
 
 
-                        //если элемент последний -------------------------------------------------------
                         if(co.TabOrder == gb.AllComponentCount - 1)
                         {
                             if(Cursor == 0)
@@ -1461,8 +1360,6 @@ public class Aligner
                         RowTop = RowTop + g.Height + 4;
                         GBStartPositionTop = RowTop;
                         
-                        //если групбокс является последним элементом среди
-                        //всех элементов на родительском групбоксе
                         if(g.TabOrder == gb.AllComponentCount - 1)
                         {
                             RowTop = RowTop + 7; 
@@ -1491,7 +1388,7 @@ public class Aligner
             for (Iterator j = tb.Groupboxes.iterator(); j.hasNext();)
             {
                 Groupbox gb = (Groupbox)j.next();
-                System.out.println("------ " + "Groupbox: "+ gb.Name + " ComponentCount: " + gb.ComponentCount + " Top: " + gb.Top + " Left: "+ gb.Left + " Высота: "+ gb.Width + " Ширина: " + gb.Height);
+                System.out.println("------ " + "Groupbox: "+ gb.Name + " ComponentCount: " + gb.ComponentCount + " Top: " + gb.Top + " Left: "+ gb.Left + " Г‚Г»Г±Г®ГІГ : "+ gb.Width + " ГГЁГ°ГЁГ­Г : " + gb.Height);
 
                 for (Iterator k = gb.Components.iterator(); k.hasNext();)
                 {
